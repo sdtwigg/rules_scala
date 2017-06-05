@@ -390,7 +390,8 @@ def _lib(ctx, non_macro_lib):
     write_manifest(ctx)
     outputs = _compile_or_empty(ctx, cjars, srcjars, non_macro_lib)
 
-    rjars += [ctx.outputs.jar]
+    if not ctx.attr.neverlink:
+      rjars += [ctx.outputs.jar]
 
     _build_deployable(ctx, rjars)
     rule_outputs = struct(ijar=outputs.ijar, class_jar=outputs.class_jar, deploy_jar=ctx.outputs.deploy_jar)
@@ -611,6 +612,7 @@ scala_library = rule(
   attrs={
       "main_class": attr.string(),
       "exports": attr.label_list(allow_files=False),
+      "neverlink": attr.bool(default=False),
       } + _implicit_deps + _common_attrs,
   outputs={
       "jar": "%{name}.jar",
@@ -625,6 +627,7 @@ scala_macro_library = rule(
   attrs={
       "main_class": attr.string(),
       "exports": attr.label_list(allow_files=False),
+      "neverlink": attr.bool(default=False),
       } + _implicit_deps + _common_attrs,
   outputs={
       "jar": "%{name}.jar",
